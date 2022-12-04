@@ -1,10 +1,11 @@
+[ bits 16 ]
 org 7C00h
 
 jmp short start
 
-Text:	db "Booting in progress... "
-Date:	db "[ RTC Placeholder ]"
-EndTxt:
+Text:	db "Booting in progress...\0"
+Date:	db "[ RTC Placeholder ]\0"
+ReadError: db "Error reading from disk\0"
 
 ; Real mode
 ; 16-bit addressing
@@ -18,15 +19,19 @@ start:
 	cld
 
 clear_screen:
-	; scroll scr down
-	mov ah, 7
+	mov ah, 0x0
+	mov al, 0x3
 	int 10h
 	jmp print_cseq
 
 print_cseq:
 	mov si, Text
-	push word EndTxt
-	jmp print
+	call print
+	mov dh, 1
+	mov dl, 0
+	mov si, Date
+	call print
+	jmp load_kernel
 
 pchar:
 	push bp
@@ -47,10 +52,8 @@ pchar:
 	ret
 
 print:
-	pop ax
-	push ax
-	cmp si, ax
-	je enter_pm
+	cmp byte [si], '\0'
+	je exit_print
 
 	call pchar
 
@@ -65,7 +68,8 @@ print:
 	jne print
 	xor dh, dh
 
-	jmp enter_pm
+exit_print:
+	ret
 
 gdt:
 	; null desc
@@ -94,20 +98,59 @@ gdt_desc:
 	dw gdt_end - gdt - 1
 	dd gdt
 
+load_kernel:
+	; 1st floppy drive
+	mov dl, DRIVE_ID
+	; disk head
+	mov dh, 0x0
+	; cylinder
+	mov ch, 0x0
+	; sector
+	mov cl, 0x2
+	; buff addres ptr
+	mov bx, KERNEL
+	; read sectors from drive
+	mov ah, 0x2
+	; sectors count
+	mov al, 20
+	int 0x13
+	; skip pm if error
+	mov dl, DRIVE_ID
+	; get last status
+	mov ah, 0x1
+	int 0x13
+	; return code
+	cmp ah, 0x0
+	jne hdl_read_err
+
 enter_pm:
+	mov si, ReadError
+	mov dh, 2
+	mov dl, 0
+	call print
+
 	; enter prot mode
 	cli
 	lgdt [gdt_desc]
 	mov edx, cr0
 	or edx, 0x00000001
 	mov cr0, edx
-	jmp CODE_SEG:load_kernel
+	jmp CODE_SEG:start_kernel
 
-load_kernel:
-	; run kernel
+hdl_read_err:
+	mov si, ReadError
+	mov dh, 2
+	mov dl, 0
+	call print
+
+[ bits 32 ]
+start_kernel:
+	jmp KERNEL
 
 times 0200h - 2 - ($ - $$) db 0
 dw 0AA55h
 ; times 1474560 - ($ - $$) db 0
 CODE_SEG equ code_desc - gdt
 DATA_SEG equ data_desc - gdt
+KERNEL equ 0x1000
+DRIVE_ID equ 0x0

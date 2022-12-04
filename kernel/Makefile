@@ -6,7 +6,7 @@ LINKER = ld
 DEL_OBJS = y
 
 kernel.bin: kernel_runner.o kernel.o
-	$(LINKER) -o $@ -Ttext 0x1000 kernel_runner.o kernel.o --oformat binary --entry main
+	$(LINKER) -o $@ -Ttext 0x1000 kernel_runner.o kernel.o --oformat binary
 	@[ "$(DEL_OBJS)" = "y" ] && rm -f -- *.o || exit 0
 
 kernel_runner.o: kernel_runner.asm
