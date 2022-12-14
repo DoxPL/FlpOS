@@ -39,7 +39,5 @@ void tty_ctest(void) {
 void main(void) {
 	tty_ctest();
 	kprint("Kernel ready!");
-	vga_clear_buff();
-	kprint("New line");
 	return;
 }

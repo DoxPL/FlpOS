@@ -1,18 +1,32 @@
 #include "vga_generic.h"
 
 static char *vga_current_addr = VIDEO_MEMORY;
+static char scroll_buff[SCROLL_BUFF_SIZE];
 
 static void vga_adjust_addr(unsigned short shift) {
-	shift = VGA_MAX_OFFSET & VGA_BUFF_MAX;
 	vga_current_addr += shift;
 }
 
 void vga_scroll_up(void) {
 	char *cell;
-	unsigned short line_bytes = VGA_MATRIX_WIDTH << 1;
-	//for (cell = VIDEO_MEMORY; cell < ((char*)VGA_MAX_OFFSET - line_bytes); cell++) {
-	//	*cell = *((char*)(cell + line_bytes));
-	//}
+	const unsigned short line_bytes = VGA_MATRIX_WIDTH << 1;
+
+	/* Read buffer */
+	for (cell = VIDEO_MEMORY; cell < VIDEO_MEMORY + line_bytes; cell++) {
+		*cell = 0x0;
+	}
+
+	for (cell = VGA_BUFF_MAX - 1; cell >= VIDEO_MEMORY + line_bytes; cell--) {
+		*cell = *(cell - line_bytes);
+	}
+}
+
+void vga_scroll_down(void) {
+	char *cell;
+	const unsigned short line_bytes = VGA_MATRIX_WIDTH << 1;
+	for (cell = VIDEO_MEMORY; cell < VGA_BUFF_MAX - line_bytes; cell++) {
+		*cell = *(cell + line_bytes);
+	}
 	vga_current_addr -= line_bytes;
 }
 
