@@ -3,8 +3,8 @@ org 7C00h
 
 jmp short start
 
-Text:	db "Booting in progress...\0"
-Date:	db "[ RTC Placeholder ]\0"
+Text:	db "  [ Booting in progress... ]\0"
+Date:	db "  [ RTC Placeholder ]\0"
 ReadError: db "Error reading from disk\0"
 
 ; Real mode
@@ -22,9 +22,10 @@ clear_screen:
 	mov ah, 0x0
 	mov al, 0x3
 	int 10h
-	jmp print_cseq
 
 print_cseq:
+	xor si, si
+	xor dx, dx
 	mov si, Text
 	call print
 	mov dh, 1

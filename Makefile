@@ -1,14 +1,17 @@
 LINKER = ld
+OS_BINARY = os_image.img
 
 .PHONY: all
 
 all:
 	@+$(MAKE) -C boot
 	@+$(MAKE) -C kernel
-	# Concatenate bootloader and kernel
-	@cat boot/boot.bin kernel/kernel.bin > os_image.img
+	@+$(MAKE) -C lib
+	@echo "Generating OS image: $(OS_BINARY)"
+	@cat boot/boot.bin kernel/kernel.bin > $(OS_BINARY)
 
 clean:
 	@rm -f -- os_image.img
 	@cd boot && $(MAKE) clean
+	@cd lib && $(MAKE) clean
 	@cd kernel && $(MAKE) clean
