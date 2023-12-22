@@ -1,4 +1,3 @@
-LINKER = ld
 OS_BINARY = os_image.img
 
 .PHONY: all
