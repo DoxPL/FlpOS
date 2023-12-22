@@ -35,13 +35,29 @@ int32_t atoi(const string array) {
 	return value * sign;
 }
 
-void itoa(uint32_t number, string array) {
-	uint8_t index = digits_count(number);
+void itoa(int32_t number, uint8_t *array[]) {
+    uint8_t i, digits, subtrahend = 0U;
+    if (number < 0) {
+        array[digits++] = '-';
+        number *= -1;
+        i = 1U;
+    } else {
+        subtrahend = 1U;
+    }
 
-	while(index--) {
-		array[index] = (number % 10) + 0x30;
+	do {
+		array[digits] = (number % 10) + 0x30;
 		number /= 10;
+		digits++;
+	} while (number);
+	
+	for (; i < digits / 2; i++) {
+	    uint8_t tmp = array[i];
+	    array[i] = array[digits - i - subtrahend];
+	    array[digits - i - subtrahend] = tmp;
 	}
+
+	array[digits] = '\0';
 }
 
 char *mset(uint8_t* mem_ptr, uint8_t value, uint32_t bytes_count) {

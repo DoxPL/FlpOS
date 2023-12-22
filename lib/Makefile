@@ -1,4 +1,6 @@
 CC = gcc
+CFLAGS = -m32 -fno-pie -c
+OS = $(shell uname)
 
 all: mod_binaries std.o
 
@@ -8,7 +10,7 @@ ifeq ("$(OS)", "Darwin")
 endif
 
 std.o: std.h std.c
-	$(CC) -c std.c
+	$(CC) $(CFLAGS) std.c
 
 clean:
 	@rm -f -- *.o
