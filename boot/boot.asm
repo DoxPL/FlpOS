@@ -3,8 +3,8 @@ org 7C00h
 
 jmp short start
 
-Text:	db "  [ Booting in progress... ]\0"
-Date:	db "  [ RTC Placeholder ]\0"
+OS_Name:	db "   (( FlpOS v1.0 ))\0"
+Booting:	db "   Booting in progress...\0"
 ReadError: db "Error reading from disk\0"
 
 ; Real mode
@@ -26,11 +26,11 @@ clear_screen:
 print_cseq:
 	xor si, si
 	xor dx, dx
-	mov si, Text
+	mov si, OS_Name
 	call print
 	mov dh, 1
 	mov dl, 0
-	mov si, Date
+	mov si, Booting
 	call print
 	jmp load_kernel
 
@@ -94,10 +94,56 @@ gdt:
 	db 0
 
 gdt_end:
+	dd 0x0
+	dd 0x0
 
 gdt_desc:
-	dw gdt_end - gdt - 1
+	dw gdt_end - gdt - 1 ; size
 	dd gdt
+
+; idt:
+; 	int_gate:
+; 	dw 0x0
+; 	dw 0x104
+; 	db 0b10001110
+; 	db 0
+; 	dw 0x0
+
+; 	task_gate:
+; 	dw 0x0 ; off_1
+; 	dw 0x44 ; sel
+; 	db 0x0 ; res
+; 	db 0b10000101 ; p, dpl, zero, gt
+; 	dw 0x0 ; off_2
+
+; 	int_gate16:
+; 	dw 0x0
+; 	dw 0x84
+; 	db 0x0
+; 	db 0b10000110
+; 	dw 0x0
+
+; 	trap_gate16:
+; 	dw 0x0
+; 	dw 0xC4
+; 	db 0x0
+; 	db 0b10000111
+; 	dw 0x0
+
+; 	; int gate here
+
+; 	trap_gate:
+; 	dw 0x0
+; 	dw 0x144
+; 	db 0b10001111
+; 	db 0
+; 	dw 0x0
+
+; idt_end:
+
+; idt_desc:
+; 	dw idt_end - idt - 1 ; size
+; 	dd idt
 
 load_kernel:
 	; 1st floppy drive
@@ -133,6 +179,7 @@ enter_pm:
 	; enter prot mode
 	cli
 	lgdt [gdt_desc]
+	; lidt [idt_desc]
 	mov edx, cr0
 	or edx, 0x00000001
 	mov cr0, edx

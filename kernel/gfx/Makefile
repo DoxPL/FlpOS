@@ -6,10 +6,10 @@ all: mod_binaries vga_generic.o
 
 mod_binaries:
 ifeq ("$(OS)", "Darwin")
-        $(eval CC=x86_64-elf-gcc)
+CC=x86_64-elf-gcc
 endif
 
-vga_generic.o: vga_generic.c vga_generic.h
+vga_generic.o: vga_generic.c
 	$(CC) $(CFLAGS) $<
 
 clean:

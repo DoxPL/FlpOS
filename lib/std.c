@@ -1,6 +1,6 @@
 #include "std.h"
 
-static int32_t pow(uint32_t base, uint8_t exponent) {
+static int32_t mpow(uint32_t base, uint8_t exponent) {
 	int32_t value = 1;
 	uint8_t index;
 
@@ -35,7 +35,7 @@ int32_t atoi(const string array) {
 	return value * sign;
 }
 
-void itoa(int32_t number, uint8_t *array[]) {
+void itoa(int32_t number, uint8_t array[]) {
     uint8_t i, digits, subtrahend = 0U;
     if (number < 0) {
         array[digits++] = '-';

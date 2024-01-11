@@ -6,11 +6,11 @@ all: mod_binaries std.o
 
 mod_binaries:
 ifeq ("$(OS)", "Darwin")
-	$(eval CC=x86_64-elf-gcc)
+CC=x86_64-elf-gcc
 endif
 
-std.o: std.h std.c
-	$(CC) $(CFLAGS) std.c
+std.o: std.c
+	$(CC) $(CFLAGS) $<
 
 clean:
 	@rm -f -- *.o

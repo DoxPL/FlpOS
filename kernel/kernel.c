@@ -1,13 +1,18 @@
 /* OS kernel code */
+#include <stdarg.h>
 #include "lib/std.h"
 #include "gfx/vga_generic.h"
-#include <stdarg.h>
+#include "irq/pic_8259.h"
+#include "irq/irq_handler.h"
 
-void putchar_c(const uint8_t symbol, color_t color);
+static void putchar_c(const uint8_t symbol, color_t color);
+static void kputs_c(const char *s, color_t color);
+
 #define putchar(str) putchar_c(str, 0x0F);
+#define kputs(str) kputs_c(str, 0x0F);
 
-void write_number(int value) {
-	char value_str[INT_DIGITS_MAX];
+static void write_number(int value) {
+	uint8_t value_str[INT_DIGITS_MAX];
 	itoa(value, value_str);
 	uint8_t *symbol_ptr = (uint8_t*) value_str;
 	while(*symbol_ptr != '\0') {
@@ -15,7 +20,7 @@ void write_number(int value) {
 	}
 }
 
-void kprintf(const char *s, ...) {
+static void kprintf(const char *s, ...) {
     va_list arg_list;
 	va_start(arg_list, s);
     for (const char *c = s; *c != '\0'; c++) {
@@ -39,13 +44,13 @@ void kprintf(const char *s, ...) {
     va_end(arg_list);
 }
 
-void kputs_c(const char *s, color_t color) {
+static void kputs_c(const char *s, color_t color) {
 	for (const char *c = s; *c != '\0'; c++) {
 		putchar_c(*c, color);
 	}
 }
 
-void putchar_c(const uint8_t symbol, color_t color) {
+static void putchar_c(const uint8_t symbol, color_t color) {
 	uint16_t char_data = 0U;
 	uint8_t bytes_in_row = 0U;
 	switch(symbol) {
@@ -65,7 +70,7 @@ void putchar_c(const uint8_t symbol, color_t color) {
 	}
 }
 
-void tty_ctest(void) {
+static void tty_ctest(void) {
 	uint8_t buff[VGA_MATRIX_WIDTH + 1];
 	buff[VGA_MATRIX_WIDTH] = '\0';
 	uint16_t cnum, color;
@@ -77,19 +82,12 @@ void tty_ctest(void) {
 	}
 }
 
-static inline unsigned char inb(unsigned short port) {
-    unsigned char val;
-	asm volatile(
-        "inb %1,%0"
-        : "=a"(val)
-        : "Nd"(port)
-		: "memory"
-    );
-    return val;
-}
-
 void main(void) {
 	tty_ctest();
-	kputs_c("Kernel ready! ", 0x0F);
+	kputs("Kernel ready!");
+	kputs("\nHello from kernel");
+	PIC_remap(1, 2);
+	idt_init();
+
 	return;
 }

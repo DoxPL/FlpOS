@@ -11,3 +11,6 @@ endif
 
 hw_io.o: hw_io.c
 	$(CC) $(CC_FLAGS) -c $< -o $@
+
+clean:
+	@rm -f -- *.o
