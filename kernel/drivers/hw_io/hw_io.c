@@ -1,6 +1,6 @@
 #include "hw_io.h"
 
-static inline void outb(unsigned short port, unsigned char value) {
+inline void outb(unsigned short port, unsigned char value) {
     __asm__ volatile(
         "outb %0, %1" :
         : "a" (value), "Nd" (port)
@@ -8,7 +8,7 @@ static inline void outb(unsigned short port, unsigned char value) {
     );
 }
 
-static inline unsigned char inb(unsigned char port) {
+inline unsigned char inb(unsigned char port) {
     unsigned char val;
     __asm__ volatile(
         "inb %1,%0"

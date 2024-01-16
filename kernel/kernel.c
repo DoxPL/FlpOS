@@ -86,8 +86,7 @@ void main(void) {
 	tty_ctest();
 	kputs("Kernel ready!");
 	kputs("\nHello from kernel");
-	PIC_remap(1, 2);
+	PIC_remap(0x20, 0x28);
 	idt_init();
-
 	return;
 }

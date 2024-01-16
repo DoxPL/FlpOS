@@ -36,7 +36,7 @@ kernel_runner.o: kernel_runner.asm
 	@+$(MAKE) -C ../lib
 
 kernel.o: kernel.c
-	$(CC) $(CC_FLAGS) -mgeneral-regs-only $(INCLUDES) -c $< -o $@
+	$(CC) $(CC_FLAGS) $(INCLUDES) -c $< -o $@
 
 clean:
 	@echo "Cleaning build environment for kernel"
