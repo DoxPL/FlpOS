@@ -1,30 +1,76 @@
 /* OS kernel code */
-#include "lib/types.h"
+#include <stdarg.h>
+#include "lib/std.h"
 #include "gfx/vga_generic.h"
+#include "irq/pic_8259.h"
+#include "irq/irq_handler.h"
 
-#define kprint(str) kprint_c(str, 0x0F)
+static void putchar_c(const uint8_t symbol, color_t color);
+static void kputs_c(const char *s, color_t color);
 
-void kprint_c(const u8ptr_t text, color_t color) {
-	u8ptr_t char_ptr = text;
-	uint16_t char_data = 0;
-	uint8_t bytes_in_row = 0;
-	while(*char_ptr != '\0') {
-		if (*char_ptr == '\n') {
-			bytes_in_row = (vga_get_addr() - VIDEO_MEMORY) % (VGA_MATRIX_WIDTH << 1);
-			vga_set_addr(vga_get_addr() + ((VGA_MATRIX_WIDTH << 1) - bytes_in_row));
-			char_ptr++;
-			continue;
-		} else if (*char_ptr == '\t') {
-			vga_set_addr(vga_get_addr() + 0x8);
-			char_ptr++;
-			continue;
-		}
-		char_data = (color << 8) | *char_ptr++;
-		vga_write_word(&char_data);
+#define putchar(str) putchar_c(str, 0x0F);
+#define kputs(str) kputs_c(str, 0x0F);
+
+static void write_number(int value) {
+	uint8_t value_str[INT_DIGITS_MAX];
+	itoa(value, value_str);
+	uint8_t *symbol_ptr = (uint8_t*) value_str;
+	while(*symbol_ptr != '\0') {
+		putchar(*symbol_ptr++);
 	}
 }
 
-void tty_ctest(void) {
+static void kprintf(const char *s, ...) {
+    va_list arg_list;
+	va_start(arg_list, s);
+    for (const char *c = s; *c != '\0'; c++) {
+		char symbol = *c;
+        if (symbol == '%') {
+			symbol = *(++c);
+            switch(symbol) {
+				case 'd':
+					int value = va_arg(arg_list, int);
+					write_number(value);
+					break;
+				case 's':
+					break;
+				default:
+					break;
+			}
+        } else {
+			putchar(symbol);
+		}
+    }
+    va_end(arg_list);
+}
+
+static void kputs_c(const char *s, color_t color) {
+	for (const char *c = s; *c != '\0'; c++) {
+		putchar_c(*c, color);
+	}
+}
+
+static void putchar_c(const uint8_t symbol, color_t color) {
+	uint16_t char_data = 0U;
+	uint8_t bytes_in_row = 0U;
+	switch(symbol) {
+		case '\0':
+			break;
+		case '\n':
+			bytes_in_row = (vga_get_addr() - VIDEO_MEMORY) % (VGA_MATRIX_WIDTH << 1);
+			vga_set_addr(vga_get_addr() + ((VGA_MATRIX_WIDTH << 1) - bytes_in_row));
+			break;
+		case '\t':
+			vga_set_addr(vga_get_addr() + 0x8);
+			break;
+		default:
+			char_data = (color << 8) | symbol;
+			vga_write_word(&char_data);
+			break;
+	}
+}
+
+static void tty_ctest(void) {
 	uint8_t buff[VGA_MATRIX_WIDTH + 1];
 	buff[VGA_MATRIX_WIDTH] = '\0';
 	uint16_t cnum, color;
@@ -32,12 +78,15 @@ void tty_ctest(void) {
 		buff[cnum] = '#'; //0xDB;
 	}
 	for (color = 1; color < 16; color++) {
-		kprint_c(buff, color);
+		kputs_c(buff, color);
 	}
 }
 
 void main(void) {
 	tty_ctest();
-	kprint("Kernel ready!");
+	kputs("Kernel ready!");
+	kputs("\nHello from kernel");
+	PIC_remap(0x20, 0x28);
+	idt_init();
 	return;
 }

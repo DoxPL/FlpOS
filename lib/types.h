@@ -1,3 +1,5 @@
+#pragma once
+
 #define NULL (void*)0
 #define true 1
 #define false 0
@@ -13,6 +15,7 @@ typedef unsigned short* u16ptr_t;
 typedef unsigned char* u8ptr_t;
 typedef void* vptr_t;
 typedef char* string;
+typedef unsigned int uword_t;
 
 typedef struct list_s {
 	int32_t value;
