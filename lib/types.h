@@ -18,6 +18,6 @@ typedef char* string;
 typedef unsigned int uword_t;
 
 typedef struct list_s {
-	int32_t value;
-	struct list_s* next;
+    int32_t value;
+    struct list_s* next;
 } list_t;
