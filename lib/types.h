@@ -16,8 +16,28 @@ typedef unsigned char* u8ptr_t;
 typedef void* vptr_t;
 typedef char* string;
 typedef unsigned int uword_t;
+typedef unsigned int vsize_t;
 
 typedef struct list_s {
     int32_t value;
     struct list_s* next;
 } list_t;
+
+typedef enum Color {
+    VGA_CBLACK = 0,
+    VGA_CBLUE,
+    VGA_CGREEN,
+    VGA_CCYAN,
+    VGA_CRED,
+    VGA_CPURPLE,
+    VGA_CBROWN,
+    VGA_CGRAY,
+    VGA_CDGRAY,
+    VGA_CLBLUE,
+    VGA_CLGREEN,
+    VGA_CLCYAN,
+    VGA_CLRED,
+    VGA_CLPURPLE,
+    VGA_CYELLOW,
+    VGA_CWHITE
+} color_t;
