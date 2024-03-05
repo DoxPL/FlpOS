@@ -12,7 +12,7 @@ void cursor_down(void) {
 
 void vga_adjust_addr(uint16_t shift) {
     vga_current_addr += shift;
-    if (vga_current_addr >= VGA_BUFF_BOUNDARY) {
+    if (vga_current_addr >= (uint8_t*)VGA_BUFF_BOUNDARY) {
         vga_scroll_down();
         vga_current_addr -= (VGA_MATRIX_WIDTH << 1);
         /* Fill the last line with spaces */

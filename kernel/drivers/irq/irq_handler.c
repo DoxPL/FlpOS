@@ -4,6 +4,8 @@
 #include "hw_io.h"
 #include "std.h"
 
+#define ASCII_ALNUM_KEY(value, offset) (key = value + offset)
+
 struct interrupt_frame
 {
     uint32_t ip;
@@ -122,7 +124,7 @@ void exception_handler_20(struct interrupt_frame *frame) {
 
 __attribute__((interrupt))
 void exception_handler_21(struct interrupt_frame *frame, uword_t err_code) {
-    KERNEL_PANIC("Control Protection Exception")
+    KERNEL_PANIC("Control Protection Exception");
 }
 
 __attribute__((interrupt))
@@ -185,93 +187,137 @@ __attribute__((interrupt))
 void interrupt_handler_1(struct interrupt_frame *frame) {
     /* 	Keyboard Interrupt */
     uint8_t scan_code = inb(0x60);
-    uint8_t key = 0;
+    uint8_t key = 0U;
+    static uint8_t offset = 0x20;
 
     switch (scan_code) {
         case KEY_Q_PRESSED:
-            key = 0x51;
+            ASCII_ALNUM_KEY(0x51, offset);
             break;
         case KEY_W_PRESSED:
-            key = 0x57;
+            ASCII_ALNUM_KEY(0x57, offset);
             break;
         case KEY_E_PRESSED:
-            key = 0x45;
+            ASCII_ALNUM_KEY(0x45, offset);
             break;
         case KEY_R_PRESSED:
-            key = 0x52;
+            ASCII_ALNUM_KEY(0x52, offset);
             break;
         case KEY_T_PRESSED:
-            key = 0x54;
+            ASCII_ALNUM_KEY(0x54, offset);
             break;
         case KEY_Y_PRESSED:
-            key = 0x59;
+            ASCII_ALNUM_KEY(0x59, offset);
             break;
         case KEY_U_PRESSED:
-            key = 0x55;
+            ASCII_ALNUM_KEY(0x55, offset);
             break;
         case KEY_I_PRESSED:
-            key = 0x49;
+            ASCII_ALNUM_KEY(0x49, offset);
             break;
         case KEY_O_PRESSED:
-            key = 0x4F;
+            ASCII_ALNUM_KEY(0x4F, offset);
             break;
         case KEY_P_PRESSED:
-            key = 0x50;
+            ASCII_ALNUM_KEY(0x50, offset);
             break;
         case KEY_A_PRESSED:
-            key = 0x41;
+            ASCII_ALNUM_KEY(0x41, offset);
             break;
         case KEY_S_PRESSED:
-            key = 0x53;
+            ASCII_ALNUM_KEY(0x53, offset);
             break;
         case KEY_D_PRESSED:
-            key = 0x44;
+            ASCII_ALNUM_KEY(0x44, offset);
             break;
         case KEY_F_PRESSED:
-            key = 0x46;
+            ASCII_ALNUM_KEY(0x46, offset);
             break;
         case KEY_G_PRESSED:
-            key = 0x47;
+            ASCII_ALNUM_KEY(0x47, offset);
             break;
         case KEY_H_PRESSED:
-            key = 0x48;
+            ASCII_ALNUM_KEY(0x48, offset);
             break;
         case KEY_J_PRESSED:
-            key = 0x4A;
+            ASCII_ALNUM_KEY(0x4A, offset);
             break;
         case KEY_K_PRESSED:
-            key = 0x4B;
+            ASCII_ALNUM_KEY(0x4B, offset);
             break;
         case KEY_L_PRESSED:
-            key = 0x4C;
+            ASCII_ALNUM_KEY(0x4C, offset);
             break;
         case KEY_Z_PRESSED:
-            key = 0x5A;
+            ASCII_ALNUM_KEY(0x5A, offset);
             break;
         case KEY_X_PRESSED:
-            key = 0x58;
+            ASCII_ALNUM_KEY(0x58, offset);
             break;
         case KEY_C_PRESSED:
-            key = 0x43;
+            ASCII_ALNUM_KEY(0x43, offset);
             break;
         case KEY_V_PRESSED:
-            key = 0x56;
+            ASCII_ALNUM_KEY(0x56, offset);
             break;
         case KEY_B_PRESSED:
-            key = 0x42;
+            ASCII_ALNUM_KEY(0x42, offset);
             break;
         case KEY_N_PRESSED:
-            key = 0x4E;
+            ASCII_ALNUM_KEY(0x4E, offset);
             break;
         case KEY_M_PRESSED:
-            key = 0x4D;
+            ASCII_ALNUM_KEY(0x4D, offset);
+            break;
+        case KEY_ZERO_PRESSED:
+            key = 0x30;
+            break;
+        case KEY_ONE_PRESSED:
+            key = 0x31;
+            break;
+        case KEY_TWO_PRESSED:
+            key = 0x32;
+            break;
+        case KEY_THREE_PRESSED:
+            key = 0x33;
+            break;
+        case KEY_FOUR_PRESSED:
+            key = 0x34;
+            break;
+        case KEY_FIVE_PRESSED:
+            key = 0x35;
+            break;
+        case KEY_SIX_PRESSED:
+            key = 0x36;
+            break;
+        case KEY_SEVEN_PRESSED:
+            key = 0x37;
+            break;
+        case KEY_EIGHT_PRESSED:
+            key = 0x38;
+            break;
+        case KEY_NINE_PRESSED:
+            key = 0x39;
             break;
         case KEY_SPACE_PRESSED:
             key = 0x20;
             break;
+        case KEY_ENTER_PRESSED:
+            putchar('\n');
+            break;
         case KEY_DOT_PRESSED:
+            key = 0x2E;
             break;
         case KEY_COMMA_PRESSED:
+            key = 0x2C;
+            break;
+        case KEY_CAPSLOCK_PRESSED:
+            offset = 0U;
+            break;
+        case KEY_CAPSLOCK_RELEASED:
+            offset = 0x20;
+            break;
+        case KEY_BACKSPACE_PRESSED:
             break;
         default:
             break;
