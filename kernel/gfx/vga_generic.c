@@ -2,7 +2,7 @@
 #include "std.h"
 
 static uint8_t *vga_current_addr = VIDEO_MEMORY;
-static int8_t scroll_buff[SCROLL_BUFF_SIZE];
+static uint8_t scroll_buff[SCROLL_BUFF_SIZE];
 
 void cursor_down(void) {
     uint8_t bytes_in_row = 0U;
@@ -21,7 +21,7 @@ void vga_adjust_addr(uint16_t shift) {
 }
 
 void vga_scroll_up(void) {
-    int8_t *cell;
+    uint8_t *cell;
     const uint16_t line_bytes = VGA_MATRIX_WIDTH << 1;
 
     /* Read buffer */
@@ -35,7 +35,7 @@ void vga_scroll_up(void) {
 }
 
 void vga_scroll_down(void) {
-    int8_t *cell;
+    uint8_t *cell;
     const uint16_t line_bytes = VGA_MATRIX_WIDTH << 1;
     for (cell = VIDEO_MEMORY; cell < VGA_BUFF_BOUNDARY - line_bytes; cell++) {
         *cell = *(cell + line_bytes);
@@ -50,22 +50,26 @@ void vga_clear_buff(void) {
     vga_current_addr = VIDEO_MEMORY - 0x140;
 }
 
-void vga_write_byte(int8_t *data) {
+void vga_write_byte(uint8_t *data) {
     *vga_current_addr = *data;
     vga_adjust_addr(sizeof(*data));
 }
 
-void vga_write_word(int16_t *data) {
-    *((int16_t *)vga_current_addr) = *data;
+void vga_write_word(uint16_t *data) {
+    *((uint16_t *)vga_current_addr) = *data;
     vga_adjust_addr(sizeof(*data));
 }
 
-void vga_write_dword(int32_t *data) {
-    *((int32_t *)vga_current_addr) = *data;
+void vga_write_dword(uint32_t *data) {
+    *((uint32_t *)vga_current_addr) = *data;
     vga_adjust_addr(sizeof(*data));
 }
 
-int8_t vga_set_addr(int8_t *new_addr) {
+void vga_replace_symbol(uint16_t *new_data) {
+    *((uint32_t *)vga_current_addr) = *new_data;
+}
+
+uint8_t vga_set_addr(uint8_t *new_addr) {
     if (new_addr < VIDEO_MEMORY || new_addr > VGA_BUFF_BOUNDARY) {
         return VGA_LOP_BADADDR;
     }
@@ -73,6 +77,6 @@ int8_t vga_set_addr(int8_t *new_addr) {
     return VGA_LOP_OK;
 }
 
-int8_t *vga_get_addr(void) {
+uint8_t *vga_get_addr(void) {
     return vga_current_addr;
 }

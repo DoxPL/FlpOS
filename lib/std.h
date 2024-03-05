@@ -15,5 +15,5 @@ void write_number(int32_t);
 void kprintf(const int8_t *, ...);
 void tty_ctest(void);
 
-#define putchar(str) putchar_c(str, 0x0F);
-#define kputs(str) kputs_c(str, 0x0F);
+#define putchar(str) putchar_c(str, VGA_CWHITE);
+#define kputs(str) kputs_c(str, VGA_CWHITE);

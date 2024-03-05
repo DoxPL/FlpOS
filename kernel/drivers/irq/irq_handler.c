@@ -328,6 +328,7 @@ void interrupt_handler_1(struct interrupt_frame *frame) {
             }
             break;
         case KEY_BACKSPACE_PRESSED:
+            putchar('\b');
             break;
         default:
             break;

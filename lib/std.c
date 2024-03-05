@@ -106,6 +106,11 @@ void putchar_c(const uint8_t symbol, color_t color) {
         case '\t':
             vga_set_addr(vga_get_addr() + 0x8);
             break;
+        case '\b':
+            vga_set_addr(vga_get_addr() - 0x2);
+            char_data = (color << 8) | 0x20;
+            vga_replace_symbol(&char_data);
+            break;
         default:
             char_data = (color << 8) | symbol;
             vga_write_word(&char_data);
