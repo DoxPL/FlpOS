@@ -188,6 +188,7 @@ void interrupt_handler_1(struct interrupt_frame *frame) {
     /* 	Keyboard Interrupt */
     uint8_t scan_code = inb(0x60);
     uint8_t key = 0U;
+    static bool_t capslock_active = false;
     static uint8_t offset = 0x20;
 
     switch (scan_code) {
@@ -312,10 +313,19 @@ void interrupt_handler_1(struct interrupt_frame *frame) {
             key = 0x2C;
             break;
         case KEY_CAPSLOCK_PRESSED:
+            capslock_active = true;
+        case KEY_LSHIFT_PRESSED:
+        case KEY_RSHIFT_PRESSED:
             offset = 0U;
             break;
         case KEY_CAPSLOCK_RELEASED:
+            capslock_active = false;
             offset = 0x20;
+        case KEY_LSHIFT_RELEASED:
+        case KEY_RSHIFT_RELEASED:
+            if (!capslock_active) {
+                offset = 0x20;
+            }
             break;
         case KEY_BACKSPACE_PRESSED:
             break;
