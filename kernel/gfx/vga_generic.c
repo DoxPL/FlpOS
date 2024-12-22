@@ -1,13 +1,36 @@
 #include "vga_generic.h"
+#include "hw_io.h"
 #include "std.h"
 
 static uint8_t *vga_current_addr = VIDEO_MEMORY;
 static uint8_t scroll_buff[SCROLL_BUFF_SIZE];
+static uint8_t row = 3U;
+static uint8_t col = 0U;
 
-void cursor_down(void) {
+static void vga_update_cursor(int8_t pos_x, int8_t pos_y) {
+    int16_t current_pos = pos_y * VGA_MATRIX_WIDTH + pos_x;
+    outb(VGA_PORT_CRTC_ADDR, VGA_REGISTER_CURSOR_LOC_LOW);
+    outb(VGA_PORT_CRTC_DATA, current_pos & 0xFF);
+    outb(VGA_PORT_CRTC_ADDR, VGA_REGISTER_CURSOR_LOC_HIGH);
+    outb(VGA_PORT_CRTC_DATA, (current_pos >> 8) & 0xFF);
+}
+
+void vga_sync_cursor(void) {
+    if (col > VGA_MATRIX_WIDTH) {
+        col = 0U;
+        row++;
+    } else {
+        col++;
+    }
+    vga_update_cursor(col, row);
+}
+
+void vga_cursor_down(void) {
     uint8_t bytes_in_row = 0U;
     bytes_in_row = (vga_get_addr() - VIDEO_MEMORY) % (VGA_MATRIX_WIDTH << 1);
     vga_set_addr(vga_get_addr() + ((VGA_MATRIX_WIDTH << 1) - bytes_in_row));
+    col = 0U;
+    vga_update_cursor(col, ++row);
 }
 
 void vga_adjust_addr(uint16_t shift) {
@@ -58,6 +81,7 @@ void vga_write_byte(uint8_t *data) {
 void vga_write_word(uint16_t *data) {
     *((uint16_t *)vga_current_addr) = *data;
     vga_adjust_addr(sizeof(*data));
+    vga_sync_cursor();
 }
 
 void vga_write_dword(uint32_t *data) {

@@ -13,7 +13,20 @@
 #define VGA_LOP_OK 0
 #define VGA_LOP_BADADDR 1
 
-void cursor_down(void);
+#define VGA_PORT_CRTC_ADDR 0x3D4
+#define VGA_PORT_CRTC_DATA 0x3D5
+
+/* Cursor Disable (byte 5), Cursor Scan Line Start (bytes 4-0) */
+#define VGA_REGISTER_CURSOR_START 0x0A
+/* Cursor Skew (bytes 6-5), Cursor Scan Line End (bytes 4-0) */
+#define VGA_REGISTER_CURSOR_END 0x0B
+/* Cursor Location High */
+#define VGA_REGISTER_CURSOR_LOC_HIGH 0x0E
+/* Cursor Location Low */
+#define VGA_REGISTER_CURSOR_LOC_LOW 0x0F
+
+void vga_sync_cursor(void);
+void vga_cursor_down(void);
 void vga_scroll_up(void);
 void vga_scroll_down(void);
 void vga_clear_buff(void);

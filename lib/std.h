@@ -15,5 +15,7 @@ void write_number(int32_t);
 void kprintf(const int8_t *, ...);
 void tty_ctest(void);
 
+extern void vga_sync_cursor(void);
+
 #define putchar(str) putchar_c(str, VGA_CWHITE);
 #define kputs(str) kputs_c(str, VGA_CWHITE);

@@ -188,10 +188,14 @@ void interrupt_handler_1(struct interrupt_frame *frame) {
     /* 	Keyboard Interrupt */
     uint8_t scan_code = inb(0x60);
     uint8_t key = 0U;
+
     static bool_t capslock_active = false;
+    static bool_t modifier_key = false;
     static uint8_t offset = 0x20;
 
     switch (scan_code) {
+        case KEY_ESCAPE_PRESSED:
+            break;
         case KEY_Q_PRESSED:
             ASCII_ALNUM_KEY(0x51, offset);
             break;
@@ -270,33 +274,43 @@ void interrupt_handler_1(struct interrupt_frame *frame) {
         case KEY_M_PRESSED:
             ASCII_ALNUM_KEY(0x4D, offset);
             break;
+        case KEY_KPD_ZERO_PRESSED:
         case KEY_ZERO_PRESSED:
             key = 0x30;
             break;
+        case KEY_KPD_ONE_PRESSED:
         case KEY_ONE_PRESSED:
             key = 0x31;
             break;
+        case KEY_KPD_TWO_PRESSED:
         case KEY_TWO_PRESSED:
             key = 0x32;
             break;
+        case KEY_KPD_THREE_PRESSED:
         case KEY_THREE_PRESSED:
             key = 0x33;
             break;
+        case KEY_KPD_FOUR_PRESSED:
         case KEY_FOUR_PRESSED:
             key = 0x34;
             break;
+        case KEY_KPD_FIVE_PRESSED:
         case KEY_FIVE_PRESSED:
             key = 0x35;
             break;
+        case KEY_KPD_SIX_PRESSED:
         case KEY_SIX_PRESSED:
             key = 0x36;
             break;
+        case KEY_KPD_SEVEN_PRESSED:
         case KEY_SEVEN_PRESSED:
             key = 0x37;
             break;
+        case KEY_KPD_EIGHT_PRESSED:
         case KEY_EIGHT_PRESSED:
             key = 0x38;
             break;
+        case KEY_KPD_NINE_PRESSED:
         case KEY_NINE_PRESSED:
             key = 0x39;
             break;
@@ -316,6 +330,7 @@ void interrupt_handler_1(struct interrupt_frame *frame) {
             capslock_active = true;
         case KEY_LSHIFT_PRESSED:
         case KEY_RSHIFT_PRESSED:
+            modifier_key = true;
             offset = 0U;
             break;
         case KEY_CAPSLOCK_RELEASED:
@@ -329,6 +344,36 @@ void interrupt_handler_1(struct interrupt_frame *frame) {
             break;
         case KEY_BACKSPACE_PRESSED:
             putchar('\b');
+            break;
+        case KEY_SLASH_PRESSED:
+            key = 0x2F;
+            break;
+        case KEY_BACKSLASH_PRESSED:
+            key = 0x5C;
+            break;
+        case KEY_BACKTICK_PRESSED:
+            key = 0x60;
+            break;
+        case KEY_SQUOTE_PRESSED:
+            key = 0x27;
+            break;
+        case KEY_DASH_PRESSED:
+            key = 0x2D;
+            break;
+        case KEY_EQSIGN_PRESSED:
+            key = 0x3D;
+            break;
+        case KEY_SEMICOLON_PRESSED:
+            key = 0x3B;
+            break;
+        case KEY_LBRACKET_PRESSED:
+            key = 0x5B;
+            break;
+        case KEY_RBRACKET_PRESSED:
+            key = 0x5D;
+            break;
+        case KEY_KPD_ASTERISK_PRESSED:
+            key = 0x2A;
             break;
         default:
             break;

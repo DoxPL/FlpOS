@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -m32 -fno-pie -c
-HEADERS = ../../lib/
+HEADERS = ../../lib/ ../drivers/hw_io
 INCLUDES = $(addprefix -I ,$(HEADERS))
 OS = $(shell uname)
 

@@ -1,5 +1,5 @@
-#include "std.h"
 #include "vga_generic.h"
+#include "std.h"
 #include <stdarg.h>
 
 static int32_t mpow(uint32_t base, uint8_t exponent) {
@@ -101,7 +101,7 @@ void putchar_c(const uint8_t symbol, color_t color) {
         case '\0':
             break;
         case '\n':
-            cursor_down();
+            vga_cursor_down();
             break;
         case '\t':
             vga_set_addr(vga_get_addr() + 0x8);
@@ -122,6 +122,7 @@ void kputs_c(const int8_t *s, color_t color) {
     for (const int8_t *c = s; *c != '\0'; c++) {
         putchar_c(*c, color);
     }
+    vga_sync_cursor();
 }
 
 void write_number(int32_t value) {
@@ -155,6 +156,7 @@ void kprintf(const int8_t *s, ...) {
         }
     }
     va_end(arg_list);
+    vga_sync_cursor();
 }
 
 void tty_ctest(void) {
