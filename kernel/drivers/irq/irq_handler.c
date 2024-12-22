@@ -275,44 +275,64 @@ void interrupt_handler_1(struct interrupt_frame *frame) {
             ASCII_ALNUM_KEY(0x4D, offset);
             break;
         case KEY_KPD_ZERO_PRESSED:
-        case KEY_ZERO_PRESSED:
             key = 0x30;
             break;
+        case KEY_ZERO_PRESSED:
+            key = modifier_key ? 0x29 : 0x30;
+            break;
         case KEY_KPD_ONE_PRESSED:
-        case KEY_ONE_PRESSED:
             key = 0x31;
             break;
+        case KEY_ONE_PRESSED:
+            key = modifier_key ? 0x21 : 0x31;
+            break;
         case KEY_KPD_TWO_PRESSED:
-        case KEY_TWO_PRESSED:
             key = 0x32;
             break;
+        case KEY_TWO_PRESSED:
+            key = modifier_key ? 0x40 : 0x32;
+            break;
         case KEY_KPD_THREE_PRESSED:
-        case KEY_THREE_PRESSED:
             key = 0x33;
             break;
+        case KEY_THREE_PRESSED:
+            key = modifier_key ? 0x23 : 0x33;
+            break;
         case KEY_KPD_FOUR_PRESSED:
-        case KEY_FOUR_PRESSED:
             key = 0x34;
             break;
+        case KEY_FOUR_PRESSED:
+            key = modifier_key ? 0x24 : 0x34;
+            break;
         case KEY_KPD_FIVE_PRESSED:
-        case KEY_FIVE_PRESSED:
             key = 0x35;
             break;
+        case KEY_FIVE_PRESSED:
+            key = modifier_key ? 0x25 : 0x35;
+            break;
         case KEY_KPD_SIX_PRESSED:
-        case KEY_SIX_PRESSED:
             key = 0x36;
             break;
+        case KEY_SIX_PRESSED:
+            key = modifier_key ? 0x5E : 0x36;
+            break;
         case KEY_KPD_SEVEN_PRESSED:
-        case KEY_SEVEN_PRESSED:
             key = 0x37;
             break;
+        case KEY_SEVEN_PRESSED:
+            key = modifier_key ? 0x26 : 0x37;
+            break;
         case KEY_KPD_EIGHT_PRESSED:
-        case KEY_EIGHT_PRESSED:
             key = 0x38;
             break;
+        case KEY_EIGHT_PRESSED:
+            key = modifier_key ? 0x2A : 0x38;
+            break;
         case KEY_KPD_NINE_PRESSED:
-        case KEY_NINE_PRESSED:
             key = 0x39;
+            break;
+        case KEY_NINE_PRESSED:
+            key = modifier_key ? 0x28 : 0x39;
             break;
         case KEY_SPACE_PRESSED:
             key = 0x20;
@@ -321,10 +341,10 @@ void interrupt_handler_1(struct interrupt_frame *frame) {
             putchar('\n');
             break;
         case KEY_DOT_PRESSED:
-            key = 0x2E;
+            key = modifier_key ? 0x3E : 0x2E;
             break;
         case KEY_COMMA_PRESSED:
-            key = 0x2C;
+            key = modifier_key ? 0x3C : 0x2C;
             break;
         case KEY_CAPSLOCK_PRESSED:
             capslock_active = true;
@@ -341,36 +361,37 @@ void interrupt_handler_1(struct interrupt_frame *frame) {
             if (!capslock_active) {
                 offset = 0x20;
             }
+            modifier_key = false;
             break;
         case KEY_BACKSPACE_PRESSED:
             putchar('\b');
             break;
         case KEY_SLASH_PRESSED:
-            key = 0x2F;
+            key = modifier_key ? 0x3F : 0x2F;
             break;
         case KEY_BACKSLASH_PRESSED:
-            key = 0x5C;
+            key = modifier_key ? 0x7C : 0x5C;
             break;
         case KEY_BACKTICK_PRESSED:
-            key = 0x60;
+            key = modifier_key ? 0x7E : 0x60;
             break;
         case KEY_SQUOTE_PRESSED:
-            key = 0x27;
+            key = modifier_key ? 0x22 : 0x27;
             break;
         case KEY_DASH_PRESSED:
-            key = 0x2D;
+            key = modifier_key ? 0x5F : 0x2D;
             break;
         case KEY_EQSIGN_PRESSED:
-            key = 0x3D;
+            key = modifier_key ? 0x2B : 0x3D;
             break;
         case KEY_SEMICOLON_PRESSED:
-            key = 0x3B;
+            key = modifier_key ? 0x3A : 0x3B;
             break;
         case KEY_LBRACKET_PRESSED:
-            key = 0x5B;
+            key = modifier_key ? 0x7B : 0x5B;
             break;
         case KEY_RBRACKET_PRESSED:
-            key = 0x5D;
+            key = modifier_key ? 0x7D : 0x5D;
             break;
         case KEY_KPD_ASTERISK_PRESSED:
             key = 0x2A;
