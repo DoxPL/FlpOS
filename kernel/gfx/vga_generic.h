@@ -1,9 +1,11 @@
-#define VIDEO_MEMORY (char*)0xB8140
+#include "../../lib/types.h"
+
+#define VIDEO_MEMORY (uint8_t*)0xB8140
 #define VGA_MATRIX_WIDTH 80
 #define VGA_MATRIX_HEIGHT 25
 #define VGA_SCR_RESOLUTION VGA_MATRIX_WIDTH * VGA_MATRIX_HEIGHT
-#define VGA_MAX_OFFSET VGA_SCR_RESOLUTION << 1
-#define VGA_BUFF_MAX (char*)(0xB8000 + VGA_MAX_OFFSET)
+#define VGA_MAX_OFFSET (VGA_SCR_RESOLUTION << 1)
+#define VGA_BUFF_BOUNDARY (uint8_t*)(0xB8000 + VGA_MAX_OFFSET)
 
 #define SCROLL_BUFF_LINES 10
 #define SCROLL_BUFF_SIZE (SCROLL_BUFF_LINES * VGA_MATRIX_HEIGHT) << 1
@@ -11,32 +13,26 @@
 #define VGA_LOP_OK 0
 #define VGA_LOP_BADADDR 1
 
-typedef enum Color {
-    VGA_CBLACK = 0,
-    VGA_CBLUE,
-    VGA_CGREEN,
-    VGA_CCYAN,
-    VGA_CRED,
-    VGA_CPURPLE,
-    VGA_CBROWN,
-    VGA_CGRAY,
-    VGA_CDGRAY,
-    VGA_CLBLUE,
-    VGA_CLGREEN,
-    VGA_CLCYAN,
-    VGA_CLRED,
-    VGA_CLPURPLE,
-    VGA_CYELLOW,
-    VGA_CWHITE
-} color_t;
+#define VGA_PORT_CRTC_ADDR 0x3D4
+#define VGA_PORT_CRTC_DATA 0x3D5
 
-typedef unsigned int vsize_t;
+/* Cursor Disable (byte 5), Cursor Scan Line Start (bytes 4-0) */
+#define VGA_REGISTER_CURSOR_START 0x0A
+/* Cursor Skew (bytes 6-5), Cursor Scan Line End (bytes 4-0) */
+#define VGA_REGISTER_CURSOR_END 0x0B
+/* Cursor Location High */
+#define VGA_REGISTER_CURSOR_LOC_HIGH 0x0E
+/* Cursor Location Low */
+#define VGA_REGISTER_CURSOR_LOC_LOW 0x0F
 
+void vga_sync_cursor(void);
+void vga_cursor_down(void);
 void vga_scroll_up(void);
 void vga_scroll_down(void);
 void vga_clear_buff(void);
-void vga_write_byte(char*);
-void vga_write_word(short*);
-void vga_write_dword(int*);
-char vga_set_addr(char*);
-char *vga_get_addr(void);
+void vga_write_byte(uint8_t*);
+void vga_write_word(uint16_t*);
+void vga_write_dword(uint32_t*);
+void vga_replace_symbol(uint16_t*);
+uint8_t vga_set_addr(uint8_t*);
+uint8_t *vga_get_addr(void);
