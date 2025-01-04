@@ -1,6 +1,8 @@
 #include "../../lib/types.h"
 
-#define VIDEO_MEMORY (uint8_t*)0xB8140
+#define VIDEO_MEMORY_BASE (uint8_t*)0xB8000
+#define VIDEO_MEMORY_INIT_OFFSET 0x140
+#define VIDEO_MEMORY VIDEO_MEMORY_BASE + VIDEO_MEMORY_INIT_OFFSET
 #define VGA_MATRIX_WIDTH 80
 #define VGA_MATRIX_HEIGHT 25
 #define VGA_SCR_RESOLUTION VGA_MATRIX_WIDTH * VGA_MATRIX_HEIGHT
@@ -34,5 +36,4 @@ void vga_write_byte(uint8_t*);
 void vga_write_word(uint16_t*);
 void vga_write_dword(uint32_t*);
 void vga_replace_symbol(uint16_t*);
-uint8_t vga_set_addr(uint8_t*);
-uint8_t *vga_get_addr(void);
+uint8_t vga_add_offset(int16_t);

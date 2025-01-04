@@ -115,7 +115,7 @@ load_kernel:
     ; read sectors from drive
     mov ah, 0x2
     ; sectors count
-    mov al, 20
+    mov al, KERNEL_SECTORS
     int 0x13
     ; skip pm if error
     mov dl, DRIVE_ID
@@ -153,8 +153,8 @@ start_kernel:
 
 times 0200h - 2 - ($ - $$) db 0
 dw 0AA55h
-; times 1474560 - ($ - $$) db 0
 CODE_SEG equ code_desc - gdt
 DATA_SEG equ data_desc - gdt
 KERNEL equ 0x1000
+KERNEL_SECTORS equ 40
 DRIVE_ID equ 0x0

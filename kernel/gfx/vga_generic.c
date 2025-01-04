@@ -4,8 +4,6 @@
 
 static uint8_t *vga_current_addr = VIDEO_MEMORY;
 static uint8_t scroll_buff[SCROLL_BUFF_SIZE];
-static uint8_t row = 3U;
-static uint8_t col = 0U;
 
 static void vga_update_cursor(int8_t pos_x, int8_t pos_y) {
     int16_t current_pos = pos_y * VGA_MATRIX_WIDTH + pos_x;
@@ -15,32 +13,27 @@ static void vga_update_cursor(int8_t pos_x, int8_t pos_y) {
     outb(VGA_PORT_CRTC_DATA, (current_pos >> 8) & 0xFF);
 }
 
-void vga_sync_cursor(void) {
-    if (col > VGA_MATRIX_WIDTH) {
-        col = 0U;
-        row++;
-    } else {
-        col++;
-    }
-    vga_update_cursor(col, row);
-}
-
-void vga_cursor_down(void) {
-    uint8_t bytes_in_row = 0U;
-    bytes_in_row = (vga_get_addr() - VIDEO_MEMORY) % (VGA_MATRIX_WIDTH << 1);
-    vga_set_addr(vga_get_addr() + ((VGA_MATRIX_WIDTH << 1) - bytes_in_row));
-    col = 0U;
-    vga_update_cursor(col, ++row);
-}
-
-void vga_adjust_addr(uint16_t shift) {
-    vga_current_addr += shift;
+static void vga_append_line(void) {
     if (vga_current_addr >= (uint8_t*)VGA_BUFF_BOUNDARY) {
         vga_scroll_down();
         vga_current_addr -= (VGA_MATRIX_WIDTH << 1);
         /* Fill the last line with spaces */
         mset16(vga_current_addr, 0x20, VGA_MATRIX_WIDTH << 1);
     }
+}
+
+void vga_sync_cursor(void) {
+    uint8_t col, row;
+    uint16_t delta = vga_current_addr - VIDEO_MEMORY_BASE;
+    col = (delta / 2) % VGA_MATRIX_WIDTH;
+    row = (delta / 2) / VGA_MATRIX_WIDTH;
+    vga_update_cursor(col, row);
+}
+
+void vga_cursor_down(void) {
+    uint8_t bytes_in_row = 0U;
+    bytes_in_row = (vga_current_addr - VIDEO_MEMORY) % (VGA_MATRIX_WIDTH << 1);
+    vga_add_offset((VGA_MATRIX_WIDTH << 1) - bytes_in_row);
 }
 
 void vga_scroll_up(void) {
@@ -75,32 +68,35 @@ void vga_clear_buff(void) {
 
 void vga_write_byte(uint8_t *data) {
     *vga_current_addr = *data;
-    vga_adjust_addr(sizeof(*data));
+    vga_add_offset(sizeof(*data));
+    vga_sync_cursor();
 }
 
 void vga_write_word(uint16_t *data) {
     *((uint16_t *)vga_current_addr) = *data;
-    vga_adjust_addr(sizeof(*data));
+    vga_add_offset(sizeof(*data));
     vga_sync_cursor();
 }
 
 void vga_write_dword(uint32_t *data) {
     *((uint32_t *)vga_current_addr) = *data;
-    vga_adjust_addr(sizeof(*data));
+    vga_add_offset(sizeof(*data));
+    vga_sync_cursor();
 }
 
 void vga_replace_symbol(uint16_t *new_data) {
     *((uint32_t *)vga_current_addr) = *new_data;
 }
 
-uint8_t vga_set_addr(uint8_t *new_addr) {
+uint8_t vga_add_offset(int16_t offset) {
+    uint8_t *new_addr = vga_current_addr + offset;
+
     if (new_addr < VIDEO_MEMORY || new_addr > VGA_BUFF_BOUNDARY) {
         return VGA_LOP_BADADDR;
     }
-    vga_current_addr = new_addr;
-    return VGA_LOP_OK;
-}
 
-uint8_t *vga_get_addr(void) {
-    return vga_current_addr;
+    vga_current_addr = new_addr;
+    vga_append_line();
+    vga_sync_cursor();
+    return VGA_LOP_OK;
 }

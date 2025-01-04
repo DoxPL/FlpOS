@@ -20,7 +20,7 @@ LINKER=x86_64-elf-ld
 endif
 
 kernel.bin: $(OBJS)
-	$(LINKER) -o $@ -Ttext 0x1000 $(OBJS) --oformat binary -m elf_i386
+	$(LINKER) -o $@ -Ttext 0x1000 --entry main $(OBJS) --oformat binary -m elf_i386
 	@[ "$(DEL_OBJS)" = "y" ] && rm -f -- *.o || exit 0
 
 drivers:
