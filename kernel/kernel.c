@@ -19,6 +19,4 @@ void main(void) {
     for(;;) {
         asm("hlt");
     }
-
-    return;
 }

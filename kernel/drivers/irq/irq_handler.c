@@ -422,6 +422,9 @@ void interrupt_handler_1(struct interrupt_frame *frame) {
             case KEY_KPD_ASTERISK_PRESSED:
                 key = 0x2A;
                 break;
+            case KEY_TAB_PRESSED:
+                key = '\t';
+                break;
             default:
                 break;
         }
