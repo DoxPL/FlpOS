@@ -1,4 +1,4 @@
-#include "vga_generic.h"
+#include "sys_io.h"
 #include "std.h"
 #include <stdarg.h>
 
@@ -62,35 +62,6 @@ void itoa(int32_t number, uint8_t array[]) {
     array[digits] = '\0';
 }
 
-uint8_t *mset(uint8_t* mem_ptr, uint8_t value, uint32_t bytes_count) {
-    if (mem_ptr != NULL) {
-        uint32_t index;
-        for (index = 0; index < bytes_count; index++) {
-            mem_ptr[index] = value;
-        }
-    }
-    return mem_ptr;
-}
-
-uint8_t *mset16(uint8_t* mem_ptr, uint16_t value, uint32_t count) {
-    if (mem_ptr != NULL) {
-        uint32_t index;
-        for (index = 0; index < count; index+=2) {
-            mem_ptr[index] = value;
-        }
-    }
-    return mem_ptr;
-}
-
-uint8_t *mcpy(int8_t *target, const int8_t *source, uint32_t bytes_count) {
-    uint32_t byte_index = 0U;
-    int8_t *target_addr = NULL;
-    while (byte_index < bytes_count) {
-        target[byte_index] = source[byte_index++];
-    }
-    return target_addr;
-}
-
 int8_t ascii_val(int8_t num) {
     return num + 0x30;
 }
@@ -101,19 +72,13 @@ void putchar_c(const uint8_t symbol, color_t color) {
         case '\0':
             break;
         case '\n':
-            vga_cursor_down();
-            break;
         case '\t':
-            vga_add_offset(0x8);
-            break;
         case '\b':
-            vga_add_offset(-0x2);
-            char_data = (color << 8) | 0x20;
-            vga_replace_symbol(&char_data);
+            write(symbol);
             break;
         default:
             char_data = (color << 8) | symbol;
-            vga_write_word(&char_data);
+            write(char_data);
             break;
     }
 }
@@ -162,7 +127,7 @@ void tty_ctest(void) {
     buff[VGA_MATRIX_WIDTH] = '\0';
     uint16_t cnum, color;
     for (cnum = 0; cnum < VGA_MATRIX_WIDTH; cnum++) {
-        buff[cnum] = '#'; //0xDB;
+        buff[cnum] = 0xDB;
     }
     for (color = 1; color < 16; color++) {
         kputs_c(buff, color);

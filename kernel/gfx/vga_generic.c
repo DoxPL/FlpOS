@@ -1,4 +1,5 @@
 #include "vga_generic.h"
+#include "memory.h"
 #include "hw_io.h"
 #include "std.h"
 
@@ -24,7 +25,7 @@ static void vga_append_line(void) {
 
 void vga_sync_cursor(void) {
     uint8_t col, row;
-    uint16_t delta = vga_current_addr - VIDEO_MEMORY_BASE;
+    uint16_t delta = vga_current_addr - VIDEO_MEMORY;
     col = (delta / 2) % VGA_MATRIX_WIDTH;
     row = (delta / 2) / VGA_MATRIX_WIDTH;
     vga_update_cursor(col, row);
@@ -66,26 +67,26 @@ void vga_clear_buff(void) {
     vga_current_addr = VIDEO_MEMORY - 0x140;
 }
 
-void vga_write_byte(uint8_t *data) {
-    *vga_current_addr = *data;
-    vga_add_offset(sizeof(*data));
+void vga_write_byte(uint8_t data) {
+    *vga_current_addr = data;
+    vga_add_offset(sizeof(data));
     vga_sync_cursor();
 }
 
-void vga_write_word(uint16_t *data) {
-    *((uint16_t *)vga_current_addr) = *data;
-    vga_add_offset(sizeof(*data));
+void vga_write_word(uint16_t data) {
+    *((uint16_t *)vga_current_addr) = data;
+    vga_add_offset(sizeof(data));
     vga_sync_cursor();
 }
 
-void vga_write_dword(uint32_t *data) {
-    *((uint32_t *)vga_current_addr) = *data;
-    vga_add_offset(sizeof(*data));
+void vga_write_dword(uint32_t data) {
+    *((uint32_t *)vga_current_addr) = data;
+    vga_add_offset(sizeof(data));
     vga_sync_cursor();
 }
 
-void vga_replace_symbol(uint16_t *new_data) {
-    *((uint32_t *)vga_current_addr) = *new_data;
+void vga_replace_symbol(uint16_t new_data) {
+    *((uint32_t *)vga_current_addr) = new_data;
 }
 
 uint8_t vga_add_offset(int16_t offset) {
@@ -99,4 +100,25 @@ uint8_t vga_add_offset(int16_t offset) {
     vga_append_line();
     vga_sync_cursor();
     return VGA_LOP_OK;
+}
+
+void vga_write_user_data(uint16_t data, size_t size) {
+    uint16_t char_data;
+    switch (data)
+    {
+        case '\n':
+            vga_cursor_down();
+            break;
+        case '\t':
+            vga_add_offset(0x8);
+            break;
+        case '\b':
+            vga_add_offset(-0x2);
+            char_data = (VGA_CWHITE << 8) | 0x20;
+            vga_replace_symbol(char_data);
+            break;
+        default:
+            vga_write_word(data);
+            break;
+    }
 }
