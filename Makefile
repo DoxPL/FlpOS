@@ -11,4 +11,5 @@ all:
 clean:
 	@rm -f -- os_image.img
 	@cd boot && $(MAKE) clean
+	@cd sys_io && $(MAKE) clean
 	@cd kernel && $(MAKE) clean

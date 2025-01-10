@@ -1,6 +1,8 @@
 #include "types.h"
 
 #define IDT_ENTRIES_MAX 256
+#define SYSCALL_WRITE 0x1
+#define SYSCALL_READ 0x2
 
 typedef struct interrupt_entry {
     uint16_t offset_1;

@@ -4,10 +4,12 @@
 #define true 1
 #define false 0
 
+typedef unsigned long long uint64_t;
 typedef unsigned int uint32_t;
 typedef unsigned short uint16_t;
 typedef unsigned char uint8_t;
 typedef unsigned char bool_t;
+typedef long long int64_t;
 typedef int int32_t;
 typedef short int16_t;
 typedef char int8_t;
@@ -17,7 +19,7 @@ typedef unsigned char* u8ptr_t;
 typedef void* vptr_t;
 typedef char* string;
 typedef unsigned int uword_t;
-typedef unsigned int vsize_t;
+typedef unsigned int size_t;
 
 typedef struct list_s {
     int32_t value;

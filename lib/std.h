@@ -1,12 +1,10 @@
 #include "types.h"
 
 #define INT_DIGITS_MAX 12
+#define VGA_MATRIX_WIDTH 80
 
 int32_t atoi(const string);
 void itoa(int32_t, uint8_t[]);
-uint8_t *mset(uint8_t*, uint8_t, uint32_t);
-uint8_t *mset16(uint8_t*, uint16_t, uint32_t);
-uint8_t *mcpy(int8_t *, const int8_t *, uint32_t);
 int8_t ascii_val(int8_t);
 
 void putchar_c(const uint8_t, color_t);

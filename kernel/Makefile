@@ -4,9 +4,9 @@ CC = gcc
 CC_FLAGS = -ffreestanding -m32 -g -fno-pie -I ..
 OS = $(shell uname)
 LINKER = ld
-HEADERS = ../lib/ drivers drivers/irq drivers/io
+HEADERS = ../misc drivers drivers/irq drivers/io
 INCLUDES = $(addprefix -I ,$(HEADERS))
-OBJS = kernel_runner.o ../lib/std.o gfx/vga_generic.o drivers/irq/pic_8259.o drivers/irq/irq_handler.o kernel.o
+OBJS = kernel_runner.o ../lib/std.o ../lib/memory.o gfx/vga_generic.o drivers/irq/pic_8259.o drivers/irq/irq_handler.o kernel.o
 DEL_OBJS = n
 export OBJS
 

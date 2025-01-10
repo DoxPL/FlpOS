@@ -1,14 +1,24 @@
 #include "irq_handler.h"
 #include "pic_8259.h"
+#include "kbrd_queue.h"
 #include "keyboard.h"
 #include "hw_io.h"
+#include "vga_generic.h"
 #include "std.h"
 
 #define ASCII_ALNUM_KEY(value, offset) (key = value + offset)
 
 struct interrupt_frame
 {
-    uint32_t ip;
+    uint32_t eax;
+    uint32_t ebx;
+    uint32_t ecx;
+    uint32_t edx;
+    uint32_t esi;
+    uint32_t edi;
+    uint32_t ebp;
+    uint32_t esp;
+    uint32_t eip;
     uint32_t cs;
     uint32_t flags;
     uint32_t sp;
@@ -16,6 +26,7 @@ struct interrupt_frame
 };
 
 static uint8_t vectors[IRQ_ENTRIES_TOTAL];
+static key_event_queue_t kbrd_queue;
 
 __attribute__((interrupt))
 void exception_handler_0(struct interrupt_frame *frame) {
@@ -187,6 +198,7 @@ __attribute__((interrupt))
 void interrupt_handler_1(struct interrupt_frame *frame) {
     /* 	Keyboard Interrupt */
     CursorKey cursor_key = KEY_CURSOR_UNUSED;
+    key_event_entry_t kbrd_event = { 0, 0 };
     uint8_t scan_code = inb(0x60);
     uint8_t key = 0U;
 
@@ -205,6 +217,8 @@ void interrupt_handler_1(struct interrupt_frame *frame) {
         switch(spl_key_event) {
             case KEY_SPECIAL_KEY_FIRST_E0:
                 spl_key_event = KEY_SPECIAL_KEY_PRESSED;
+                kbrd_event.event_type = SPL_KEY_EVENT;
+                kbrd_event.payload = scan_code;
                 break;
             case KEY_SPECIAL_KEY_PRESSED:
                 if (scan_code == KEY_SPECIAL_KEY) {
@@ -431,7 +445,12 @@ void interrupt_handler_1(struct interrupt_frame *frame) {
     }
 
     if (key > 0) {
-        putchar(key);
+        kbrd_event.event_type = STD_KEY_EVENT;
+        kbrd_event.payload = key;
+    }
+
+    if (kbrd_event.payload > 0) {
+        kbrd_queue_enqueue(&kbrd_queue, kbrd_event);
     }
 
     PIC_8259_send_EOI(IRQ_KEYBOARD_INT);
@@ -479,7 +498,43 @@ void interrupt_handler_7(struct interrupt_frame *frame) {
     PIC_8259_send_EOI(IRQ_LPT1);
 }
 
-void (*exception_handler_array[IRQ_ENTRIES_TOTAL])() = {
+__attribute__((interrupt))
+void interrupt_handler_8(struct interrupt_frame *frame) {
+    /* Syscall handler */
+    key_event_entry_t kbrd_event = { 0, 0 };
+    uint32_t syscall_id;
+    uint32_t *val_user = NULL;
+
+    __asm__ volatile(
+        "movl %%ebx, %0\n"
+        "movl %%ecx, %1\n"
+        : "=r"(syscall_id),
+        "=r"(val_user)
+    );
+
+    switch (syscall_id) {
+        case SYSCALL_WRITE:
+            if (val_user != NULL) {
+                vga_write_user_data(*val_user, 1);
+            }
+            break;
+        case SYSCALL_READ:
+            if (!kbrd_queue_is_empty(&kbrd_queue)) {
+                kbrd_queue_dequeue(&kbrd_queue, &kbrd_event);
+                if (val_user != NULL) {
+                    *val_user = ((kbrd_event.event_type << 8) | \
+                        kbrd_event.payload) & 0xFFFF;
+                }
+            }
+            break;
+        default:
+            break;
+    }
+
+    PIC_8259_send_EOI(0x28);
+}
+
+void (*interrupt_handler_array[IRQ_ENTRIES_TOTAL])() = {
     exception_handler_0,
     exception_handler_1,
     exception_handler_2,
@@ -519,7 +574,8 @@ void (*exception_handler_array[IRQ_ENTRIES_TOTAL])() = {
     interrupt_handler_4,
     interrupt_handler_5,
     interrupt_handler_6,
-    interrupt_handler_7
+    interrupt_handler_7,
+    interrupt_handler_8
 };
 
 void idt_init(void) {
@@ -528,12 +584,16 @@ void idt_init(void) {
     uint8_t vector;
 
     for (vector = 0; vector < IRQ_ENTRIES_TOTAL; vector++) {
-        idt_create_gate(vector, exception_handler_array[vector], 0x8E);
+        idt_create_gate(vector, interrupt_handler_array[vector], 0x8E);
         vectors[vector] = 1;
     }
 
     __asm__ volatile ("lidt %0" : : "m"(_idtr_desc));
     __asm__ volatile ("sti");
+}
+
+void create_kbrd_queue(void) {
+    kbrd_queue_init(&kbrd_queue);
 }
 
 void irq_clear_mask(uint8_t irq_line) {
