@@ -4,7 +4,6 @@
 #include "keyboard.h"
 #include "hw_io.h"
 #include "vga_generic.h"
-#include "std.h"
 
 #define ASCII_ALNUM_KEY(value, offset) (key = value + offset)
 
@@ -378,7 +377,7 @@ void interrupt_handler_1(struct interrupt_frame *frame) {
                 key = 0x20;
                 break;
             case KEY_ENTER_PRESSED:
-                putchar('\n');
+                key = 0x13;
                 break;
             case KEY_DOT_PRESSED:
                 key = modifier_key ? 0x3E : 0x2E;
@@ -404,7 +403,7 @@ void interrupt_handler_1(struct interrupt_frame *frame) {
                 modifier_key = false;
                 break;
             case KEY_BACKSPACE_PRESSED:
-                putchar('\b');
+                key = 0x8;
                 break;
             case KEY_SLASH_PRESSED:
                 key = modifier_key ? 0x3F : 0x2F;

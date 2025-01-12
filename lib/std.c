@@ -83,7 +83,7 @@ void putchar_c(const uint8_t symbol, color_t color) {
     }
 }
 
-void kputs_c(const int8_t *s, color_t color) {
+void puts_c(const int8_t *s, color_t color) {
     for (const int8_t *c = s; *c != '\0'; c++) {
         putchar_c(*c, color);
     }
@@ -98,7 +98,7 @@ void write_number(int32_t value) {
     }
 }
 
-void kprintf(const int8_t *s, ...) {
+void printstr(const int8_t *s, ...) {
     va_list arg_list;
     va_start(arg_list, s);
     for (const int8_t *c = s; *c != '\0'; c++) {
@@ -122,6 +122,12 @@ void kprintf(const int8_t *s, ...) {
     va_end(arg_list);
 }
 
+uint8_t kbrd_getkey(void) {
+    key_event_entry_t kbrd_event;
+    read_key(&kbrd_event);
+    return kbrd_event.payload;
+}
+
 void tty_ctest(void) {
     uint8_t buff[VGA_MATRIX_WIDTH + 1];
     buff[VGA_MATRIX_WIDTH] = '\0';
@@ -130,6 +136,6 @@ void tty_ctest(void) {
         buff[cnum] = 0xDB;
     }
     for (color = 1; color < 16; color++) {
-        kputs_c(buff, color);
+        puts_c(buff, color);
     }
 }

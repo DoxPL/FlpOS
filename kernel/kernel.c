@@ -3,6 +3,7 @@
 #include "lib/std.h"
 #include "irq/pic_8259.h"
 #include "irq/irq_handler.h"
+#include "cli.h"
 
 void main(void) {
     PIC_remap(PIC_NEW_MASTER_OFFSET, PIC_NEW_SLAVE_OFFSET);
@@ -14,8 +15,8 @@ void main(void) {
     outb(0x60, 0xA7);
 
     tty_ctest();
-    kputs("Kernel ready!");
-    kputs("\nHello from kernel");
+    kputs("Kernel ready!\n");
+    create_cli();
 
     for(;;) {
         asm("hlt");
