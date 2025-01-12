@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -m32 -fno-pie -c
 LINKER = ld
-HEADERS = ../hw_io ../../gfx ../../../misc ../../../lib
+HEADERS = ../hw_io ../../gfx ../../../misc
 INCLUDES = $(addprefix -I ,$(HEADERS))
 OS = $(shell uname)
 

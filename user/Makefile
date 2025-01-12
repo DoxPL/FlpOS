@@ -1,17 +1,20 @@
 CC = gcc
-CFLAGS = -m32 -fno-pie -c
-HEADERS = ../misc
+LINKER = ld
+HEADERS = ../misc ../lib
 INCLUDES = $(addprefix -I ,$(HEADERS))
+CFLAGS = -m32 -fno-pie -c
+OBJS = cli.o
 OS = $(shell uname)
 
-all: mod_binaries sys_io.o
+all: mod_binaries $(OBJS)
 
 mod_binaries:
 ifeq ("$(OS)", "Darwin")
 CC=x86_64-elf-gcc
+LINKER=x86_64-elf-ld
 endif
 
-sys_io.o: sys_io.c
+cli.o: cli.c
 	$(CC) $(CFLAGS) $(INCLUDES) $<
 
 clean:
