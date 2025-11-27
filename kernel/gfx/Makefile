@@ -1,15 +1,9 @@
-CC = gcc
-CFLAGS = -m32 -fno-pie -c
+include ../../common/BuildCommon.mk
+
 HEADERS = ../../misc ../../lib ../drivers/hw_io
 INCLUDES = $(addprefix -I ,$(HEADERS))
-OS = $(shell uname)
 
-all: mod_binaries vga_generic.o
-
-mod_binaries:
-ifeq ("$(OS)", "Darwin")
-CC=x86_64-elf-gcc
-endif
+all: vga_generic.o
 
 vga_generic.o: vga_generic.c
 	$(CC) $(CFLAGS) $(INCLUDES) $<

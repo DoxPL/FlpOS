@@ -1,18 +1,10 @@
-CC = gcc
-LINKER = ld
+include ../common/BuildCommon.mk
+
 HEADERS = ../misc ../kernel/gfx/ ../sys_io
 INCLUDES = $(addprefix -I ,$(HEADERS))
-CFLAGS = -m32 -fno-pie -c
 OBJS = memory.o std.o
-OS = $(shell uname)
 
-all: mod_binaries $(OBJS)
-
-mod_binaries:
-ifeq ("$(OS)", "Darwin")
-CC=x86_64-elf-gcc
-LINKER=x86_64-elf-ld
-endif
+all: $(OBJS)
 
 ../sys_io/sys_io.o:
 	@+$(MAKE) -C ../sys_io

@@ -1,11 +1,10 @@
-ASM = nasm
-LINKER = ld
-FLAGS_BOOT = -f bin -o
-FLAGS_RUN = -f elf -o
+include ../common/AsmCommon.mk
+
+ASM_FLAGS = -f bin -o
 
 boot.bin: boot.asm
 	@echo "Building bootloader..."
-	$(ASM) $(FLAGS_BOOT) $@ $<
+	$(ASM) $(ASM_FLAGS) $@ $<
 
 clean:
 	@echo "Cleaning build environment"
