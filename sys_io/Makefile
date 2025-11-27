@@ -1,15 +1,9 @@
-CC = gcc
-CFLAGS = -m32 -fno-pie -c
+include ../common/BuildCommon.mk
+
 HEADERS = ../misc
 INCLUDES = $(addprefix -I ,$(HEADERS))
-OS = $(shell uname)
 
-all: mod_binaries sys_io.o
-
-mod_binaries:
-ifeq ("$(OS)", "Darwin")
-CC=x86_64-elf-gcc
-endif
+all: sys_io.o
 
 sys_io.o: sys_io.c
 	$(CC) $(CFLAGS) $(INCLUDES) $<

@@ -1,17 +1,9 @@
-CC = gcc
-CFLAGS = -m32 -fno-pie -c
-LINKER = ld
+include ../../../common/BuildCommon.mk
+
 HEADERS = ../hw_io ../../gfx ../../../misc ../../../lib
 INCLUDES = $(addprefix -I ,$(HEADERS))
-OS = $(shell uname)
 
-all: mod_binaries idt.o kbrd_queue.o irq_handler.o pic_8259.o
-
-mod_binaries:
-ifeq ("$(OS)", "Darwin")
-CC=x86_64-elf-gcc
-LINKER=x86_64-elf-ld
-endif
+all: idt.o kbrd_queue.o irq_handler.o pic_8259.o
 
 idt.o: idt.c
 	$(CC) $(INCLUDES) -mgeneral-regs-only $(CFLAGS) $< -o $@
